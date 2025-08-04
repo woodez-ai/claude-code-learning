@@ -1,0 +1,131 @@
+/* Logo Container */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Logo Text */
+.logo-text {
+  font-weight: 800;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease-in-out infinite;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Individual Letter Animations */
+.letter {
+  display: inline-block;
+  animation: bounce 2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.letter-w { animation-delay: 0s; }
+.letter-o { animation-delay: 0.1s; }
+.letter-o2 { animation-delay: 0.2s; }
+.letter-d { animation-delay: 0.3s; }
+.letter-e { animation-delay: 0.4s; }
+.letter-z { animation-delay: 0.5s; }
+.letter-f { animation-delay: 0.6s; }
+.letter-i { animation-delay: 0.7s; }
+
+/* Subtitle */
+.logo-subtitle {
+  font-size: 0.75em;
+  color: #6b7280;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  text-align: center;
+  opacity: 0.8;
+  animation: fadeInOut 4s ease-in-out infinite alternate;
+}
+
+/* Keyframe Animations */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Hover Effects */
+.logo-container:hover .logo-text {
+  animation-duration: 1s;
+}
+
+.logo-container:hover .letter {
+  animation-duration: 1s;
+}
+
+.logo-container:hover .logo-subtitle {
+  opacity: 1;
+  color: #4f46e5;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .logo-text {
+    letter-spacing: -0.01em;
+  }
+  
+  .logo-subtitle {
+    font-size: 0.7em;
+  }
+}
+
+/* Special Effects for Different Contexts */
+.logo-hero {
+  transform: scale(1.2);
+  margin: 2rem 0;
+}
+
+.logo-navbar {
+  transform: scale(0.9);
+}
+
+.logo-login {
+  margin: 1rem 0;
+}
+
+/* Loading Animation */
+.logo-loading .letter {
+  animation: loading 1.5s linear infinite;
+}
+
+@keyframes loading {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
