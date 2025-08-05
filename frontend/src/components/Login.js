@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LogIn, UserPlus, ChevronDown } from 'lucide-react';
 import apiService from '../services/api';
-import Logo from './Logo';
+import WoodezLogo from './WoodezLogo';
 import TopPortfolios from './TopPortfolios';
 import MarketMovers from './MarketMovers';
 
@@ -88,12 +88,8 @@ const Login = ({ onLogin, onShowRegister }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
-            <div className="flex items-center space-x-4">
-              <Logo size="small" className="logo-login" showSubtitle={false} />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">WoodezFi</h1>
-                <p className="text-xs text-gray-600">Gameifying Stock Trading</p>
-              </div>
+            <div className="flex items-center">
+              <WoodezLogo size="small" showSubtitle={true} />
             </div>
 
             {/* Center Menu Items */}
@@ -184,7 +180,7 @@ const Login = ({ onLogin, onShowRegister }) => {
                     setShowRegisterDropdown(!showRegisterDropdown);
                     setShowLoginDropdown(false);
                   }}
-                  className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-black bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <UserPlus className="h-4 w-4 mr-2" />
                   Create Account

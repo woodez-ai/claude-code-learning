@@ -36,6 +36,15 @@ class Stock(models.Model):
     current_price = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
     last_updated = models.DateTimeField(null=True, blank=True)
     
+    # Analyst consensus data
+    analyst_recommendation = models.CharField(max_length=20, blank=True, null=True)  # Buy, Hold, Sell
+    analyst_target_price = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    analyst_count = models.IntegerField(null=True, blank=True)
+    
+    # Options data
+    put_call_ratio = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
+    options_last_updated = models.DateTimeField(null=True, blank=True)
+    
     class Meta:
         ordering = ['symbol']
     
@@ -78,3 +87,27 @@ class Position(models.Model):
         if self.total_cost > 0:
             return ((self.current_value - self.total_cost) / self.total_cost) * 100
         return Decimal('0.00')
+
+
+class PortfolioImport(models.Model):
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE, related_name='imports')
+    import_date = models.DateTimeField(auto_now_add=True)
+    filename = models.CharField(max_length=255)
+    total_rows = models.IntegerField(default=0)
+    successful_imports = models.IntegerField(default=0)
+    failed_imports = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=[
+        ('parsing', 'Parsing'),
+        ('preview', 'Preview'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed')
+    ], default='parsing')
+    error_log = models.JSONField(blank=True, null=True)
+    preview_data = models.JSONField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-import_date']
+    
+    def __str__(self):
+        return f"{self.portfolio.name} - {self.filename} ({self.status})"

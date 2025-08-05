@@ -3,3 +3,4 @@ djangorestframework==3.16.0
 yfinance==0.2.65
 python-dotenv==1.1.1
 django-cors-headers==4.7.0
+gunicorn==21.2.0

@@ -1,6 +1,6 @@
 {
-  "short_name": "Woodezfi",
-  "name": "Woodezfi - Portfolio Manager",
+  "short_name": "Woodez Industries",
+  "name": "Woodez Industries - Portfolio Manager",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#667eea",
+  "theme_color": "#D2691E",
   "background_color": "#ffffff"
 }

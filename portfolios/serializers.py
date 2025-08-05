@@ -32,8 +32,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
-        fields = ['id', 'symbol', 'name', 'exchange', 'current_price', 'last_updated']
-        read_only_fields = ['id', 'current_price', 'last_updated']
+        fields = [
+            'id', 'symbol', 'name', 'exchange', 'current_price', 'last_updated',
+            'analyst_recommendation', 'analyst_target_price', 'analyst_count',
+            'put_call_ratio', 'options_last_updated'
+        ]
+        read_only_fields = [
+            'id', 'current_price', 'last_updated', 'analyst_recommendation', 
+            'analyst_target_price', 'analyst_count', 'put_call_ratio', 'options_last_updated'
+        ]
 
 
 class PositionSerializer(serializers.ModelSerializer):
@@ -61,6 +68,11 @@ class PositionSerializer(serializers.ModelSerializer):
         )
         validated_data['stock'] = stock
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Remove stock_symbol if provided during update since we can't change the stock
+        validated_data.pop('stock_symbol', None)
+        return super().update(instance, validated_data)
 
 
 class PortfolioSerializer(serializers.ModelSerializer):

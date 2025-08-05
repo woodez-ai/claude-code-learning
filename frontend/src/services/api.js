@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '';
 
 class ApiService {
   constructor() {
@@ -114,6 +114,11 @@ class ApiService {
     return response.data;
   }
 
+  async updatePosition(id, positionData) {
+    const response = await this.api.put(`/api/positions/${id}/`, positionData);
+    return response.data;
+  }
+
   async deletePosition(id) {
     await this.api.delete(`/api/positions/${id}/`);
   }
@@ -133,6 +138,43 @@ class ApiService {
   // Market data endpoints
   async getMarketMovers() {
     const response = await this.api.get('/api/market-movers/');
+    return response.data;
+  }
+
+  // Portfolio performance endpoints
+  async getPortfolioPerformance(portfolioId, period = '1mo') {
+    const response = await this.api.get(`/api/portfolios/${portfolioId}/performance/`, {
+      params: { period }
+    });
+    return response.data;
+  }
+
+  // Stock analysis endpoints
+  async refreshStockAnalysis() {
+    const response = await this.api.post('/api/refresh-stock-analysis/');
+    return response.data;
+  }
+
+  // CSV Import endpoints
+  async importPortfolioCSV(portfolioId, csvFile) {
+    const formData = new FormData();
+    formData.append('csv_file', csvFile);
+    
+    const response = await this.api.post(`/api/portfolios/${portfolioId}/import-csv/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
+  async confirmCSVImport(importId) {
+    const response = await this.api.post(`/api/imports/${importId}/confirm/`);
+    return response.data;
+  }
+
+  async getImportStatus(importId) {
+    const response = await this.api.get(`/api/imports/${importId}/status/`);
     return response.data;
   }
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import apiService from '../services/api';
-import Logo from './Logo';
+import WoodezLogo from './WoodezLogo';
 
 const Register = ({ onRegister, onShowLogin }) => {
   const [formData, setFormData] = useState({
@@ -53,7 +53,7 @@ const Register = ({ onRegister, onShowLogin }) => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Logo size="large" className="logo-login" />
+          <WoodezLogo size="large" showSubtitle={true} />
           <div className="mt-4 mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-100">
             <UserPlus className="h-6 w-6 text-green-600" />
           </div>

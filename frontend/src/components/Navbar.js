@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
 import apiService from '../services/api';
-import Logo from './Logo';
+import WoodezLogo from './WoodezLogo';
 
 const Navbar = ({ onLogout }) => {
   const handleLogout = () => {
@@ -15,7 +15,7 @@ const Navbar = ({ onLogout }) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Logo size="small" className="logo-navbar" />
+              <WoodezLogo size="small" showSubtitle={true} />
             </div>
           </div>
           <div className="flex items-center">

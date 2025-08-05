@@ -62,3 +62,160 @@ Features
   3. Login: admin / admin123
   4. Create portfolios and add stock positions with
   real Yahoo Finance data
+
+
+Front-end:
+
+##Stop##
+pkill -f "react-scripts"
+
+
+##Start##
+cd /Users/kwood/projects/coding-repos/claude-code-learning/frontend && npm start
+
+
+
+
+
+
+
+ Usage Commands:
+
+  # Development (with hot reload)
+  docker-compose up
+
+  # Production frontend build
+  docker build -t portfolio-frontend ./frontend
+
+  # Run production frontend
+  docker run -p 80:80 portfolio-frontend
+
+  # Build and run everything
+  docker-compose up --build
+
+  Key Features:
+
+  - Multi-stage builds for smaller production images
+  - Hot reloading in development
+  - Production optimization with nginx
+  - Security headers and best practices
+  - Health checks for container monitoring
+  - Volume mounting for development workflow
+
+  The setup is production-ready and follows Docker best practices!
+
+⏺ Here are the equivalent Podman commands for the Docker setup:
+
+  🦭 Podman Usage Commands
+
+  Development (with hot reload):
+
+  # Start all services in development mode
+  podman-compose up
+
+  # Start with build
+  podman-compose up --build
+
+  # Run in background
+  podman-compose up -d
+
+  Production Frontend Build:
+
+  # Build production frontend image
+  podman build -t portfolio-frontend ./frontend
+
+  # Run production frontend container
+  podman run -p 80:80 portfolio-frontend
+
+  # Run with custom name
+  podman run -d --name portfolio-frontend-prod -p 80:80 portfolio-frontend
+
+  Backend Build:
+
+  # Build backend image
+  podman build -t portfolio-backend .
+
+  # Run backend container
+  podman run -p 8000:8000 portfolio-backend
+
+  Individual Container Commands:
+
+  # Build and run frontend dev container
+  podman build -f frontend/Dockerfile.dev -t portfolio-frontend-dev ./frontend
+  podman run -p 3000:3000 -v ./frontend:/app:Z portfolio-frontend-dev
+
+  # Build and run backend container
+  podman run -p 8000:8000 -v .:/app:Z portfolio-backend
+
+  Podman-Compose Alternative (if not available):
+
+  # Create a pod for networking
+  podman pod create --name portfolio-pod -p 3000:3000 -p 8000:8000
+
+  # Run backend in pod
+  podman run -d --pod portfolio-pod --name backend \
+    -v .:/app:Z portfolio-backend
+
+  # Run frontend in pod
+  podman run -d --pod portfolio-pod --name frontend \
+    -v ./frontend:/app:Z portfolio-frontend-dev
+
+  Management Commands:
+
+  # View running containers
+  podman ps
+
+  # View all containers
+  podman ps -a
+
+  # Stop all containers
+  podman-compose down
+
+  # Remove containers and images
+  podman-compose down --rmi all
+
+  # View logs
+  podman logs portfolio-frontend
+  podman-compose logs frontend
+
+  # Execute commands in running container
+  podman exec -it portfolio-frontend /bin/sh
+
+  Volume Management:
+
+  # Create named volumes (optional)
+  podman volume create portfolio-node-modules
+  podman volume create portfolio-data
+
+  # Run with named volumes
+  podman run -v portfolio-node-modules:/app/node_modules:Z \
+    -v ./frontend:/app:Z portfolio-frontend-dev
+
+  Rootless Mode (Podman's default):
+
+  # All commands run rootless by default in Podman
+  # No need for sudo (unlike Docker)
+
+  # Check if running rootless
+  podman info | grep rootless
+
+  Key Differences from Docker:
+
+  - No daemon required - Podman runs containers directly
+  - Rootless by default - Enhanced security
+  - SELinux labels - Use :Z for volume mounts on SELinux systems
+  - Pod concept - Can group containers like Kubernetes pods
+  - Drop-in replacement - Most Docker commands work with podman substitution
+
+  Production Deployment:
+
+  # Build for production
+  podman build -t portfolio-frontend:prod ./frontend
+  podman build -t portfolio-backend:prod .
+
+  # Run production stack
+  podman run -d --name portfolio-backend-prod -p 8000:8000 portfolio-backend:prod
+  podman run -d --name portfolio-frontend-prod -p 80:80 portfolio-frontend:prod
+
+  The main advantage of Podman is that it runs daemonless and rootless, providing better
+  security and requiring no background services!
