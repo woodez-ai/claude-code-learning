@@ -123,6 +123,15 @@ class ApiService {
     await this.api.delete(`/api/positions/${id}/`);
   }
 
+  async sellPosition(positionId, quantity, sellPrice = null) {
+    const response = await this.api.post('/api/portfolios/sell_position/', {
+      position_id: positionId,
+      quantity: quantity,
+      sell_price: sellPrice
+    });
+    return response.data;
+  }
+
   // Public endpoints (no auth required)
   async getTopPortfolios() {
     const response = await this.api.get('/api/top-portfolios/');

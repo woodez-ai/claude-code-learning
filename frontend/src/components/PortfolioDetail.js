@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, RefreshCw, TrendingUp, TrendingDown, Trash2, Edit, Download, BarChart, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw, TrendingUp, TrendingDown, Trash2, Edit, Download, BarChart, Upload, DollarSign } from 'lucide-react';
 import apiService from '../services/api';
 import AddPosition from './AddPosition';
 import PortfolioNews from './PortfolioNews';
@@ -16,7 +16,11 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
   const [showAddPosition, setShowAddPosition] = useState(false);
   const [showUpdatePosition, setShowUpdatePosition] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showSellModal, setShowSellModal] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const [sellQuantity, setSellQuantity] = useState('');
+  const [sellPrice, setSellPrice] = useState('');
+  const [selling, setSelling] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -91,6 +95,48 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
       } catch (err) {
         setError('Failed to delete position');
       }
+    }
+  };
+
+  const handleSellPosition = (position) => {
+    setSelectedPosition(position);
+    setSellQuantity('');
+    setSellPrice(position.stock.current_price ? position.stock.current_price.toString() : '');
+    setShowSellModal(true);
+  };
+
+  const handleConfirmSell = async () => {
+    if (!selectedPosition || !sellQuantity) {
+      setError('Please enter quantity to sell');
+      return;
+    }
+
+    const quantity = parseFloat(sellQuantity);
+    const price = sellPrice ? parseFloat(sellPrice) : null;
+
+    if (quantity <= 0) {
+      setError('Quantity must be greater than 0');
+      return;
+    }
+
+    if (quantity > parseFloat(selectedPosition.quantity)) {
+      setError('Cannot sell more shares than owned');
+      return;
+    }
+
+    try {
+      setSelling(true);
+      const result = await apiService.sellPosition(selectedPosition.id, quantity, price);
+      await loadPortfolio();
+      setShowSellModal(false);
+      setSelectedPosition(null);
+      setSellQuantity('');
+      setSellPrice('');
+      alert(`Successfully sold ${quantity} shares for ${formatCurrency(result.cash_from_sale)}`);
+    } catch (err) {
+      setError('Failed to sell position: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSelling(false);
     }
   };
 
@@ -292,7 +338,7 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Portfolio Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <p className="text-sm text-gray-500">Total Value</p>
               <p className="text-2xl font-bold text-gray-900">
@@ -303,6 +349,12 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
               <p className="text-sm text-gray-500">Total Cost</p>
               <p className="text-xl text-gray-700">
                 {formatCurrency(portfolio.total_cost)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Cash Balance</p>
+              <p className="text-xl font-bold text-green-700">
+                {formatCurrency(portfolio.cash_balance || 0)}
               </p>
             </div>
             <div>
@@ -497,6 +549,13 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
+                          onClick={() => handleSellPosition(position)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Sell position"
+                        >
+                          <DollarSign className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => handleUpdatePosition(position)}
                           className="text-blue-600 hover:text-blue-900"
                           title="Update position"
@@ -548,6 +607,96 @@ const PortfolioDetail = ({ portfolioId, onBack }) => {
           onClose={() => setShowImportModal(false)}
           onImportComplete={handleImportComplete}
         />
+      )}
+
+      {/* Sell Position Modal */}
+      {showSellModal && selectedPosition && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Sell {selectedPosition.stock.symbol}
+            </h3>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                You own {parseFloat(selectedPosition.quantity).toLocaleString()} shares
+              </p>
+              <p className="text-sm text-gray-600 mb-4">
+                Current Price: {selectedPosition.stock.current_price ? formatCurrency(selectedPosition.stock.current_price) : 'N/A'}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity to Sell
+                </label>
+                <input
+                  type="number"
+                  value={sellQuantity}
+                  onChange={(e) => setSellQuantity(e.target.value)}
+                  max={selectedPosition.quantity}
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter quantity"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sell Price (optional, uses current price if empty)
+                </label>
+                <input
+                  type="number"
+                  value={sellPrice}
+                  onChange={(e) => setSellPrice(e.target.value)}
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter sell price"
+                />
+              </div>
+
+              {sellQuantity && sellPrice && (
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-sm text-gray-700">
+                    Total Sale Value: {formatCurrency(parseFloat(sellQuantity) * parseFloat(sellPrice))}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowSellModal(false);
+                  setSelectedPosition(null);
+                  setSellQuantity('');
+                  setSellPrice('');
+                  setError('');
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={selling}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSell}
+                disabled={selling || !sellQuantity}
+                className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {selling ? 'Selling...' : 'Sell Position'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

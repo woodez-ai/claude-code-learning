@@ -75,6 +75,74 @@ class PortfolioViewSet(viewsets.ModelViewSet):
             'updated_stocks': updated_stocks
         })
 
+    @action(detail=False, methods=['post'])
+    def sell_position(self, request):
+        position_id = request.data.get('position_id')
+        quantity_to_sell = request.data.get('quantity', 0)
+        sell_price = request.data.get('sell_price')
+        
+        try:
+            position = Position.objects.get(id=position_id, portfolio__user=request.user)
+            
+            if not sell_price:
+                sell_price = position.stock.current_price
+                if not sell_price:
+                    return Response(
+                        {'error': 'No sell price provided and no current price available'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            quantity_to_sell = float(quantity_to_sell)
+            sell_price = float(sell_price)
+            
+            if quantity_to_sell <= 0:
+                return Response(
+                    {'error': 'Quantity to sell must be greater than 0'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if quantity_to_sell > float(position.quantity):
+                return Response(
+                    {'error': 'Cannot sell more shares than owned'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Calculate cash from sale
+            cash_from_sale = quantity_to_sell * sell_price
+            
+            # Update portfolio cash balance
+            position.portfolio.cash_balance += cash_from_sale
+            position.portfolio.save()
+            
+            # Update or delete position
+            if quantity_to_sell == float(position.quantity):
+                # Selling all shares, delete position
+                position.delete()
+                position_action = 'deleted'
+            else:
+                # Partial sell, update quantity
+                position.quantity = float(position.quantity) - quantity_to_sell
+                position.save()
+                position_action = 'updated'
+            
+            return Response({
+                'message': f'Successfully sold {quantity_to_sell} shares of {position.stock.symbol}',
+                'cash_from_sale': cash_from_sale,
+                'new_cash_balance': float(position.portfolio.cash_balance),
+                'position_action': position_action
+            })
+            
+        except Position.DoesNotExist:
+            return Response(
+                {'error': 'Position not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to sell position: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 class StockViewSet(viewsets.ModelViewSet):
     queryset = Stock.objects.all()

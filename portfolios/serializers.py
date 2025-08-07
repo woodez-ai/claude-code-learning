@@ -87,7 +87,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
         model = Portfolio
         fields = [
             'id', 'name', 'description', 'user', 'positions', 'total_value', 
-            'total_cost', 'total_gain_loss', 'position_count', 'created_at', 'updated_at'
+            'total_cost', 'total_gain_loss', 'cash_balance', 'position_count', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
@@ -105,7 +105,7 @@ class PortfolioSummarySerializer(serializers.ModelSerializer):
         model = Portfolio
         fields = [
             'id', 'name', 'description', 'total_value', 'total_cost', 
-            'total_gain_loss', 'position_count', 'created_at', 'updated_at'
+            'total_gain_loss', 'cash_balance', 'position_count', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
